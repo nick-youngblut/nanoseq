@@ -187,7 +187,6 @@ workflow NANOSEQ{
         .set { ch_sample }
 
     if (!params.skip_demultiplexing) {
-
         /*
          * MODULE: Demultipexing using qcat
          */
@@ -197,7 +196,7 @@ workflow NANOSEQ{
             .flatten()
             .map { it -> [ it, it.baseName.substring(0,it.baseName.lastIndexOf('.'))] }
             .join(ch_sample, by: 1) // join on barcode
-            .map { it -> [ it[2], it[1], it[3], it[4], it[5], it[6] ] }
+            .map { it -> [ it[2], it[1], it[3], it[4], it[5], it[6] ] } 
             .set { ch_fastq }
         ch_software_versions = ch_software_versions.mix(QCAT.out.versions.ifEmpty(null))
     } else {
@@ -206,7 +205,9 @@ workflow NANOSEQ{
                 .map { it -> if (it[6].toString().endsWith('.gz')) [ it[0], it[6], it[2], it[1], it[4], it[5] ] }
                 .set { ch_fastq }
         } else {
-            ch_fastq = Channel.empty()
+            ch_sample
+                .map { it -> [ it[0], it[6] ] }
+                .set { ch_fastq }
         }
     }
 
@@ -435,12 +436,12 @@ workflow NANOSEQ{
         MULTIQC (
         ch_multiqc_config,
         ch_multiqc_custom_config.collect().ifEmpty([]),
-        ch_fastqc_multiqc.ifEmpty([]),
-        ch_samtools_multiqc.collect().ifEmpty([]),
-        ch_featurecounts_gene_multiqc.ifEmpty([]),
-        ch_featurecounts_transcript_multiqc.ifEmpty([]),
-        CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
-        ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
+        ch_fastqc_multiqc.collect().ifEmpty([])//,
+        //ch_samtools_multiqc.collect().ifEmpty([]),
+        //ch_featurecounts_gene_multiqc.ifEmpty([]),
+        //ch_featurecounts_transcript_multiqc.ifEmpty([]),
+        //CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect(),
+        //ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml')
         )
     }
 }

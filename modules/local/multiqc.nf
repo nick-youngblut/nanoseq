@@ -10,11 +10,11 @@ process MULTIQC {
     path ch_multiqc_config
     path ch_multiqc_custom_config
     path ch_fastqc_multiqc
-    path ch_sortbam_stats_multiqc
-    path ch_featurecounts_gene_multiqc
-    path ch_featurecounts_transcript_multiqc
-    path software_versions_yaml
-    path workflow_summary
+    //path ch_sortbam_stats_multiqc
+    //path ch_featurecounts_gene_multiqc
+    //path ch_featurecounts_transcript_multiqc
+    //path software_versions_yaml
+    //path workflow_summary
 
     output:
     path "*multiqc_report.html", emit: report
